@@ -50,9 +50,11 @@ get_filename_component(APP_PATH "${CMAKE_CURRENT_SOURCE_DIR}/" ABSOLUTE)
 include("${CINDER_PATH}/proj/cmake/modules/cinderMakeApp.cmake")
 
 list(APPEND SOURCE_FILES    src/image_classification_app.cc
-                            src/util.cc)
+                            src/util.cc
+                            src/cnn.cc)
 
-list(APPEND TEST_FILES tests/test_util.cc)
+list(APPEND TEST_FILES  tests/test_util.cc
+                        tests/test_cnn.cc)
 
 ci_make_app(
         APP_NAME        image-classification
