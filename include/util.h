@@ -19,9 +19,9 @@ using std::vector;
 using std::ifstream;
 
 using Eigen::Vector3;
-using Eigen::MatrixXi;  // matrix of int with dynamic size
+using Eigen::MatrixXf;  // matrix of float with dynamic size
 using Eigen::Matrix;
-using Eigen::VectorXi;
+using Eigen::VectorXf;
 using Eigen::Dynamic;
 
 
@@ -48,9 +48,9 @@ namespace Util {
    * @param path path from the working directory root
    * @param exp_width expected width of the image, all image should have the same training size
    * @param exp_height expected height of the image, all image should have the same training size
-   * @return vector size3 with RGB matrix, empty vector if image failed to parsed
+   * @return list size 3 (CNN::CHANNEL_COUNT) with RGB matrix, empty vector if image failed to parsed
    */
-  MatrixXi* imageToMatrix(const string& path, int exp_width, int exp_height);
+  MatrixXf* imageToMatrix(const string& path, int exp_width, int exp_height);
   
   
   

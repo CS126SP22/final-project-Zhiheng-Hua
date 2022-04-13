@@ -1,4 +1,5 @@
 #include "util.h"
+#include "cnn.h"
 #include <catch2/catch.hpp>
 
 
@@ -17,14 +18,12 @@ TEST_CASE("test getDatasetImageCount") {
 }
 
 TEST_CASE("test imageToMatrix") {
-  MatrixXi* result = Util::imageToMatrix("data/natural_images/airplane/airplane_0000.jpg", 256, 256);
-  vector<int> rgb_tl{223, 240, 232};  // top left corner
-  vector<int> rgb_rb{0, 0, 0};        // right bottom corner
+  MatrixXf* result = Util::imageToMatrix("data/natural_images/airplane/airplane_0000.jpg", 256, 256);
+  vector<float> rgb_tl{223, 240, 232};  // top left corner
+  vector<float> rgb_rb{0, 0, 0};        // right bottom corner
   
-  REQUIRE(result->size() == 3);
-  for (int i = 0; i < 3; i++) {
-    REQUIRE(result[i].rows() == 256);
-    REQUIRE(result[i].cols() == 256);
+  for (int i = 0; i < CNN::CHANNEL_COUNT; i++) {
+    REQUIRE(result[i].size() == 65536);
     REQUIRE(result[i](0, 0) == rgb_tl[i]);
     REQUIRE(result[i](255, 255) == rgb_rb[i]);
   }

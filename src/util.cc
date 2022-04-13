@@ -33,32 +33,32 @@ namespace Util {
   }
   
   // reference: https://www.cplusplus.com/forum/beginner/267364/
-  MatrixXi* imageToMatrix(const string& path, int exp_width, int exp_height) {
+  MatrixXf* imageToMatrix(const string& path, int exp_width, int exp_height) {
     // channel_num = # 8-bit components (channel) per pixel, in this case channel is forced, so not used
     int width, height, channel_num;
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &channel_num, 3);
     
-    MatrixXi* img = NULL;
+    MatrixXf* img = nullptr;
     
     if (data != nullptr && width > 0 && height > 0) {
-      img = new MatrixXi[3];
+      img = new MatrixXf[3];
       
-      MatrixXi matR(exp_height, exp_width);
-      MatrixXi matG(exp_height, exp_width);
-      MatrixXi matB(exp_height, exp_width);
+      MatrixXf matR(exp_height, exp_width);
+      MatrixXf matG(exp_height, exp_width);
+      MatrixXf matB(exp_height, exp_width);
       
       // zero padding excessive image part
       for (int r = 0; r < exp_height; r++) {
         if (r >= height) {
-          matR.row(r) = VectorXi::Zero(exp_width);
-          matG.row(r) = VectorXi::Zero(exp_width);
-          matB.row(r) = VectorXi::Zero(exp_width);
+          matR.row(r) = VectorXf::Zero(exp_width);
+          matG.row(r) = VectorXf::Zero(exp_width);
+          matB.row(r) = VectorXf::Zero(exp_width);
           continue;
         }
         for (int c = 0 ; c < exp_width; c++) {
-          matR(r, c) = (c < width) ? static_cast<int>(data[r * width + c + 0]) : 0;
-          matG(r, c) = (c < width) ? static_cast<int>(data[r * width + c + 1]) : 0;
-          matB(r, c) = (c < width) ? static_cast<int>(data[r * width + c + 2]) : 0;
+          matR(r, c) = (c < width) ? static_cast<float>(data[r * width + c + 0]) : 0;
+          matG(r, c) = (c < width) ? static_cast<float>(data[r * width + c + 1]) : 0;
+          matB(r, c) = (c < width) ? static_cast<float>(data[r * width + c + 2]) : 0;
         }
       }
       

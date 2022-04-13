@@ -7,17 +7,24 @@
 
 #include <Eigen/Dense>
 #include <string>
+#include <map>
+#include <stdexcept>
+#include <utility>
 
-using Eigen::MatrixXi;  // matrix of int with dynamic size
+using Eigen::MatrixXf;  // matrix of int with dynamic size
 using std::cout;
 using std::endl;
 using std::string;
 using std::vector;
 using Eigen::Vector3;
+using std::map;
+using std::pair;
 
 
 class CNN {
   public:
+    CNN();
+    
     /**
      * parse all image from dataset into matrices, store them in the CNN class
      * also extract labels of the data using the dir names
@@ -30,16 +37,24 @@ class CNN {
      * @param img_height expected height of the image, all image should have the same training size
      */
     void loadImageFromDataset(const string& path, int img_count, int img_width, int img_height);
-
+    
+    
+    /**
+     * constants
+     */
+    const static int CHANNEL_COUNT = 3;
+    
     /**
      * getters 
      */
     const vector<string>& getLabels();
-    const vector<MatrixXi*>& getImages();
+    const map<string, vector<MatrixXf*>>& getImages();
 
   private:
     vector<string> labels_;
-    vector<MatrixXi*> images_;
+    map<string, vector<MatrixXf*>> images_;
+    
+    MatrixXf conv_kernels[CHANNEL_COUNT];
 };
 
 

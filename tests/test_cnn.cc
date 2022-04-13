@@ -7,7 +7,12 @@ TEST_CASE("test loadImageFromDataset") {
 
   vector<string> expected_labels{"airplane","car","cat","dog","flower","fruit","motorbike","person"};
   REQUIRE(cnn.getLabels() == expected_labels);
-  REQUIRE(cnn.getImages().size() == 88);
+  
+  size_t count = 0;
+  for (const auto& label: expected_labels) {
+    count += cnn.getImages().at(label).size();
+  }
+  REQUIRE(count == 88);
 }
 
 
