@@ -3,8 +3,10 @@
 
 
 
-CNN::CNN() {
-  
+CNN::CNN(int kernel_size) {
+  for (auto & conv_kernel : conv_kernels) {
+    conv_kernel = MatrixXf::Random(kernel_size, kernel_size);
+  }
 }
 
 void CNN::loadImageFromDataset(const string &path, int img_count, int img_width, int img_height) {
@@ -33,4 +35,6 @@ const vector<string>& CNN::getLabels() {
 const map<string, vector<MatrixXf*>>& CNN::getImages() {
   return images_;
 }
+
+
 

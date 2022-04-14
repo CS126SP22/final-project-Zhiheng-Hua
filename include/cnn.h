@@ -11,19 +11,27 @@
 #include <stdexcept>
 #include <utility>
 
-using Eigen::MatrixXf;  // matrix of int with dynamic size
+
 using std::cout;
 using std::endl;
 using std::string;
 using std::vector;
-using Eigen::Vector3;
 using std::map;
 using std::pair;
+
+using Eigen::DenseBase;
+using Eigen::Vector3;
+using Eigen::MatrixXf;  // matrix of int with dynamic size
 
 
 class CNN {
   public:
-    CNN();
+    /**
+     * constructor
+     * @param kernel_size size of the kernel to use for convolution,
+     * should be an odd number
+     */
+    CNN(int kernel_size);
     
     /**
      * parse all image from dataset into matrices, store them in the CNN class
