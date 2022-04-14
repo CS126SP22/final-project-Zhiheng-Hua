@@ -138,9 +138,8 @@ namespace Util {
     return result;
   }
 
-  float softmax(const VectorXf& input_layer, int idx) {
-    assert(idx < input_layer.size());
-    return exp(input_layer[idx]) / input_layer.array().exp().sum();
+  VectorXf softmax(const VectorXf& input_layer) {
+    return input_layer.array().exp() / input_layer.array().exp().sum();
   }
 };
 

@@ -90,5 +90,8 @@ TEST_CASE("test softmax") {
   VectorXf input(3);
   input << 1, 2, 3;
 
-  REQUIRE( Util::softmax(input, 1) == Approx(exp(2) / (exp(1) + exp(2) + exp(3))) );
+  VectorXf result = Util::softmax(input);
+  for (int i = 1; i <= 3; i++) {
+    REQUIRE(result[i - 1] == Approx(exp(i) / (exp(1) + exp(2) + exp(3))) ); 
+  }
 }

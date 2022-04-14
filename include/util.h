@@ -82,9 +82,8 @@ namespace Util {
   
   /**
    * softmax function
-   * @param input_layer input layer, a 1-dimensional vector
-   * @param idx representing the i-th element to apply softmax
-   * @return softmax result
+   * @param input_layer input layer, a 1-dimensional vector with same size of labels counts
+   * @return softmax result, probability vector of same size as input_layer
    */
-  float softmax(const VectorXf& input_layer, int idx);
+  VectorXf softmax(const VectorXf& input_layer);
 }
