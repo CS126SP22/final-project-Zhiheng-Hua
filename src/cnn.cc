@@ -3,29 +3,38 @@
 
 
 
+CNN::CNN(int kernel_size) {
+  for (auto & conv_kernel : conv_kernels) {
+    conv_kernel = MatrixXf::Random(kernel_size, kernel_size);
+  }
+}
 
 void CNN::loadImageFromDataset(const string &path, int img_count, int img_width, int img_height) {
-  cout << "loading image from dataset" << endl;
-  
   labels_ = Util::getLabelVectorFromDataset(path);
-  images_.reserve(img_count);
+  
+  for (auto & label : labels_) {
+    images_.insert(pair<string, vector<MatrixXf*>>(label, {}));
+  }
 
   for (const auto & label_folder : fs::directory_iterator(path)) {
+    // add images to each label
+    vector<MatrixXf*>& curr_vector = images_[label_folder.path().filename().string()];
+    
     for (const auto & img_iter : fs::directory_iterator(label_folder.path().string())) {
       string img_path = img_iter.path().string();
-      MatrixXi* rgb_image = Util::imageToMatrix(img_path, img_width, img_height);
-      images_.push_back(rgb_image);
+      MatrixXf* rgb_image = Util::imageToMatrix(img_path, img_width, img_height);
+      curr_vector.push_back(rgb_image);
     }
   }
-  
-  cout << "successfully loaded " << images_.size() << "images"<< endl;
 }
 
 const vector<string>& CNN::getLabels() {
   return labels_;
 }
 
-const vector<MatrixXi *> &CNN::getImages() {
+const map<string, vector<MatrixXf*>>& CNN::getImages() {
   return images_;
 }
+
+
 
