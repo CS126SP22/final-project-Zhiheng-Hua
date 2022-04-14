@@ -79,4 +79,12 @@ namespace Util {
    * @return max pooling result
    */
   MatrixXf maxPooling(const MatrixXf& input, int lh, int lw, int sh, int sw);
+  
+  /**
+   * softmax function
+   * @param input_layer input layer, a 1-dimensional vector
+   * @param idx representing the i-th element to apply softmax
+   * @return softmax result
+   */
+  float softmax(const VectorXf& input_layer, int idx);
 }

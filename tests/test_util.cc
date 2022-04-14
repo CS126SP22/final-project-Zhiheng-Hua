@@ -1,6 +1,7 @@
 #include "util.h"
 #include "cnn.h"
 #include <catch2/catch.hpp>
+#include <math.h>
 
 
 
@@ -83,4 +84,11 @@ TEST_CASE("test maxPooling") {
 
     REQUIRE(actual == expected);
   }
+}
+
+TEST_CASE("test softmax") {
+  VectorXf input(3);
+  input << 1, 2, 3;
+
+  REQUIRE( Util::softmax(input, 1) == Approx(exp(2) / (exp(1) + exp(2) + exp(3))) );
 }
