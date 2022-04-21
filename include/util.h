@@ -38,7 +38,7 @@ namespace Util {
   
   /**
    * 
-   * @param path @param path path of the dataset, with structure:
+   * @param path path of the dataset, with structure:
    * --- dataset folder name
    *    --- label_name
    *        --- img of this class
@@ -58,10 +58,10 @@ namespace Util {
   /**
    * convolution operation and Relu activation function, return one MatrixXf
    * @param input array of 3 MatrixXf, representing the input
-   * @param conv_kernels array of 3 MatrixXf, representing the kernels to use for each input 
+   * @param conv_kernel array of 3 MatrixXf, representing the kernels to use for each input 
    * @return MatrixXf representing the result, size should be the same as matrices in the input
    */
-  MatrixXf convolution3D(const MatrixXf* input, const MatrixXf* conv_kernels);
+  MatrixXf convolution3D(const MatrixXf* input, const MatrixXf* conv_kernel);
   
   /**
    * take in a matrix reference, apply Relu on it
@@ -86,4 +86,8 @@ namespace Util {
    * @return softmax result, probability vector of same size as input_layer
    */
   VectorXf softmax(const VectorXf& input_layer);
+
+  VectorXf sigmoid(const VectorXf &vec);
+
+  MatrixXf sigmoidPrime(const VectorXf &vec);
 }

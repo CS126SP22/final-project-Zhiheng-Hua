@@ -95,3 +95,17 @@ TEST_CASE("test softmax") {
     REQUIRE(result[i - 1] == Approx(exp(i) / (exp(1) + exp(2) + exp(3))) ); 
   }
 }
+
+TEST_CASE("test sigmoid") {
+  VectorXf input(3);
+  input << 1, 2, 3;
+
+  VectorXf result = Util::sigmoid(input);
+  for (int i = 1; i <= 3; i++) {
+    REQUIRE(result[i - 1] == Approx(1 / (1 + exp(-input[i]))) );
+  }
+}
+//
+//TEST_CASE("test sigmoidPrime") {
+//  
+//}

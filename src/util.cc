@@ -78,11 +78,11 @@ namespace Util {
   }
 
 
-  MatrixXf convolution3D(const MatrixXf* input, const MatrixXf* conv_kernels) {
+  MatrixXf convolution3D(const MatrixXf* input, const MatrixXf* conv_kernel) {
     int input_height = input[0].rows();
     int input_width = input[0].cols();
-    int kernel_height = conv_kernels[0].rows();
-    int kernel_width = conv_kernels[0].cols();
+    int kernel_height = conv_kernel[0].rows();
+    int kernel_width = conv_kernel[0].cols();
     
     MatrixXf result = MatrixXf::Zero(input_height, input_width);
     
@@ -92,7 +92,7 @@ namespace Util {
     for (int channel = 0; channel < CNN::CHANNEL_COUNT; channel++) {
       // convolution for each input kernel pair
       const MatrixXf& curr_input = input[channel];
-      const MatrixXf& curr_kernel = conv_kernels[channel];
+      const MatrixXf& curr_kernel = conv_kernel[channel];
       
       // change padding for input matrix first
       padding_mat.block(1, 1, input_height, input_width) = curr_input;
@@ -100,7 +100,7 @@ namespace Util {
       for (int r = 0 ; r < input_height; r++) {
         for (int c = 0; c < input_width; c++) {
           MatrixXf curr_blk = padding_mat.block(r, c, kernel_height, kernel_width);
-          result(r, c) += (curr_blk.array() * conv_kernels[channel].array()).sum();
+          result(r, c) += (curr_blk.array() * conv_kernel[channel].array()).sum();
         }
       }
     }
@@ -141,5 +141,14 @@ namespace Util {
   VectorXf softmax(const VectorXf& input_layer) {
     return input_layer.array().exp() / input_layer.array().exp().sum();
   }
+
+  VectorXf sigmoid(const VectorXf &vec) {
+    return 1 / (1 + (-vec).array().exp());
+  }
+
+  MatrixXf sigmoidPrime(const VectorXf &vec) {
+    return {};
+  }
+  
 };
 
