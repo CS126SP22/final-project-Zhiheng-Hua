@@ -142,13 +142,14 @@ namespace Util {
     return input_layer.array().exp() / input_layer.array().exp().sum();
   }
 
-  VectorXf sigmoid(const VectorXf &vec) {
-    return 1 / (1 + (-vec).array().exp());
+  VectorXf sigmoid(const VectorXf& vec) {
+    return 1 / ((-vec.array()).exp() + 1);
   }
 
-  MatrixXf sigmoidPrime(const VectorXf &vec) {
-    return {};
+  MatrixXf sigmoidPrime(const VectorXf& vec) {
+    MatrixXf res = MatrixXf::Zero(vec.size(), vec.size());
+    res.diagonal() = (-vec.array()).exp() / ((-vec.array()).exp() + 1).pow(2);
+    return res;
   }
-  
 };
 

@@ -86,8 +86,18 @@ namespace Util {
    * @return softmax result, probability vector of same size as input_layer
    */
   VectorXf softmax(const VectorXf& input_layer);
-
+  
+  /**
+   * sigmoid function applied to a vector
+   * @param vec input vector
+   * @return output vector
+   */
   VectorXf sigmoid(const VectorXf &vec);
-
+  
+  /**
+   * sigmoid function derivative of a vector
+   * @param vec output vector of sigmod function
+   * @return Jacobian matrix as sigmoidPrime
+   */
   MatrixXf sigmoidPrime(const VectorXf &vec);
 }

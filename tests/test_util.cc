@@ -101,11 +101,25 @@ TEST_CASE("test sigmoid") {
   input << 1, 2, 3;
 
   VectorXf result = Util::sigmoid(input);
+  
   for (int i = 1; i <= 3; i++) {
-    REQUIRE(result[i - 1] == Approx(1 / (1 + exp(-input[i]))) );
+    REQUIRE( result[i - 1] == Approx(1 / (1 + exp(-i))) );
   }
 }
-//
-//TEST_CASE("test sigmoidPrime") {
-//  
-//}
+
+TEST_CASE("test sigmoidPrime") {
+  VectorXf input(3);
+  input << 1, 2, 3;
+
+  MatrixXf result = Util::sigmoidPrime(input);
+  
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      if (i == j) {
+        REQUIRE( result(i, j) == Approx(exp(-i-1) / pow(1 + exp(-i-1), 2)) );
+      } else {
+        REQUIRE( result(i, j) == 0 );
+      }
+    }
+  }
+}
