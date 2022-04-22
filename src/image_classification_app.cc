@@ -39,8 +39,8 @@ void ImageClassificationApp::fileDrop( ci::app::FileDropEvent event ) {
     return;
   }
 
-  image_path_ = "data/" + file_vec[0].filename().string();
-  message_ = "image file: " + image_path_;
+  image_path_ = file_vec[0].string();
+  message_ = "image uploaded successfully";
   message_color_ = ColorT<float>("green");
 
   // TODO: make a Prediction
