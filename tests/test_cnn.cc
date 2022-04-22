@@ -17,15 +17,26 @@ TEST_CASE("test loadImageFromDataset") {
   REQUIRE(cnn.getTotalImageCount() == 88);
 }
 
-TEST_CASE("playground") {
+TEST_CASE("test forward costFunctionPrime") {
   CNN cnn(5);
   cnn.loadImageFromDataset("data/test_image/", 25, 25);
 
   auto Xs = cnn.featureForwardPropagation();
+  
+  for (int iter = 0; iter < 1000; iter++) {
+    float error1;
+    pair<MatrixXf, MatrixXf> result1 = cnn.costFunctionPrime(Xs, &error1);
 
-  cout << "finish propagation" << endl;
-
-  pair<MatrixXf, MatrixXf> result = cnn.costFunctionPrime(Xs);
-  cout << "result" << endl;
-  cout << result.first << endl;
+    cnn.updateW1(result1.first);
+    cnn.updateW2(result1.second);
+  }
+  
+  VectorXf pred = cnn.FcForwardPropagation(Xs["flower"][0])[2];
+  
+  int pred_idx = 0;
+  for (int i = 0; i < pred.size(); i++) {
+    pred_idx = (pred[i] > pred[pred_idx]) ? i : pred_idx;
+  }
+  
+  REQUIRE(pred_idx == 4);
 }

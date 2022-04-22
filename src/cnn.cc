@@ -89,10 +89,12 @@ vector<VectorXf> CNN::FcForwardPropagation(const VectorXf& X) {
   return {Z2, a2, y_hat};
 }
 
-pair<MatrixXf, MatrixXf> CNN::costFunctionPrime(const map<string, vector<VectorXf>>& Xs) {
+pair<MatrixXf, MatrixXf> CNN::costFunctionPrime(const map<string, vector<VectorXf>>& Xs, float* error) {
   // maximum ascend directions for each weight matrix
   MatrixXf dJdW1 = MatrixXf::Zero(s_, t_);
   MatrixXf dJdW2 = MatrixXf::Zero(t_, c_);
+  
+  *error = 0;
   
   // loop over all input images
   for (const auto& key_val : Xs) {
@@ -111,6 +113,7 @@ pair<MatrixXf, MatrixXf> CNN::costFunctionPrime(const map<string, vector<VectorX
       MatrixXf dYdZ3 = softmaxJacobian(y_hat);  // (c_ x c_)
       // Error vector
       VectorXf err_vec = (y_hat - y);           // (1 x c_).T
+      *error += pow(err_vec.norm(), 2);
 
       /* dJdW2 */
       VectorXf delta3 = err_vec.transpose() * dYdZ3;  // (1 x c_) * (c_ x c_)
@@ -126,11 +129,21 @@ pair<MatrixXf, MatrixXf> CNN::costFunctionPrime(const map<string, vector<VectorX
     }
   }
   
+  *error /= (float) n_;
+  
   // average dJdW2 and dJdW1
   dJdW2 *= (2.0f / (float) n_);
   dJdW1 *= (2.0f / (float) n_);
   
   return {dJdW1, dJdW2};
+}
+
+void CNN::updateW1(const MatrixXf& dJdW1) {
+  W1_ -= dJdW1;
+}
+
+void CNN::updateW2(const MatrixXf& dJdW2) {
+  W2_ -= dJdW2;
 }
 
 const vector<string>& CNN::getLabels() {

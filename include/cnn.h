@@ -66,7 +66,19 @@ class CNN {
      * @param Xs mapping of labels to images, where images represented by flattened vectors
      * @return {dJdW1, dJdW2}, the gradient matrix with respect to the two weight matrices
      */
-    pair<MatrixXf, MatrixXf> costFunctionPrime(const map<string, vector<VectorXf>>& Xs);
+    pair<MatrixXf, MatrixXf> costFunctionPrime(const map<string, vector<VectorXf>>& Xs, float* error);
+    
+    /**
+     * update W1
+     * @param dJdW1 gradient of cost function with respect to W1 
+     */
+    void updateW1(const MatrixXf& dJdW1);
+
+    /**
+     * update W2
+     * @param dJdW2 gradient of cost function with respect to W2 
+     */
+    void updateW2(const MatrixXf& dJdW2);
 
     /**
      * constants
