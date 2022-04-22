@@ -10,7 +10,6 @@ CNN::CNN(int kernel_size) {
 }
 
 void CNN::loadImageFromDataset(const string &path, int img_width, int img_height) {
-  cout << "start loading image" << endl;
   // init labels_, c_ (label count), image_width_, image_height_
   labels_ = Util::getLabelVectorFromDataset(path);
   c_ = labels_.size();
@@ -39,8 +38,6 @@ void CNN::loadImageFromDataset(const string &path, int img_width, int img_height
       ++n_;
     }
   }
-
-  cout << "finish loading " << n_ <<  " image" << endl;
 }
 
 MatrixXf CNN::softmaxJacobian(const VectorXf& y_hat) {
@@ -75,7 +72,7 @@ map<string, vector<VectorXf>> CNN::featureForwardPropagation() {
     for (const MatrixXf* img : entry.second) {
       MatrixXf conv_res = Util::convolution3D(img, conv_kernels_);
       Util::Relu(conv_res);
-      MatrixXf pooling_res = Util::maxPooling(conv_res, 5, 5, 5, 5);
+      MatrixXf pooling_res = Util::maxPooling(conv_res, 5, 5, 5, 5);  // FIXME: hardcoded
       VectorXf X = Util::flatten(pooling_res);
       Xs[entry.first].push_back(X);
     }
