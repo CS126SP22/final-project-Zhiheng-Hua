@@ -3,7 +3,7 @@
 
 TEST_CASE("test loadImageFromDataset") {
   CNN cnn(3);
-  cnn.loadImageFromDataset("data/test_image/", 80, 256, 256);
+  cnn.loadImageFromDataset("data/test_image/", 256, 256);
 
   vector<string> expected_labels{"airplane","car","cat","dog","flower","fruit","motorbike","person"};
   REQUIRE(cnn.getLabels() == expected_labels);
@@ -13,6 +13,19 @@ TEST_CASE("test loadImageFromDataset") {
     count += cnn.getImages().at(label).size();
   }
   REQUIRE(count == 88);
+  
+  REQUIRE(cnn.getTotalImageCount() == 88);
 }
 
+TEST_CASE("playground") {
+  CNN cnn(5);
+  cnn.loadImageFromDataset("data/test_image/", 25, 25);
 
+  auto Xs = cnn.featureForwardPropagation();
+
+  cout << "finish propagation" << endl;
+
+  pair<MatrixXf, MatrixXf> result = cnn.costFunctionPrime(Xs);
+  cout << "result" << endl;
+  cout << result.first << endl;
+}

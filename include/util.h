@@ -1,15 +1,13 @@
 #pragma once
 
-#include "cinder/app/App.h"
-#include "cinder/app/RendererGl.h"
-#include "cinder/gl/gl.h"
-#include "cinder/ImageIo.h"
 #include "cnn.h"
 
 #include <Eigen/Dense>
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <filesystem>
+#include <iostream>
 
 
 namespace fs = std::experimental::filesystem;
@@ -26,6 +24,7 @@ using Eigen::MatrixXf;  // matrix of float with dynamic size
 using Eigen::Matrix;
 using Eigen::VectorXf;
 using Eigen::Dynamic;
+using Eigen::Map;
 
 
 namespace Util {
@@ -78,7 +77,7 @@ namespace Util {
    * @param sw stride width
    * @return max pooling result
    */
-  MatrixXf maxPooling(const MatrixXf& input, int lh, int lw, int sh, int sw);
+  MatrixXf maxPooling(const MatrixXf& input, int lw, int lh, int sw, int sh);
   
   /**
    * softmax function
@@ -86,6 +85,13 @@ namespace Util {
    * @return softmax result, probability vector of same size as input_layer
    */
   VectorXf softmax(const VectorXf& input_layer);
+  
+  /**
+   * 
+   * @param mat 
+   * @return 
+   */
+  VectorXf flatten(MatrixXf mat);
   
   /**
    * sigmoid function applied to a vector

@@ -1,10 +1,5 @@
 #include "util.h"
 
-#include "cinder/gl/Texture.h"
-#include "cinder/Surface.h"
-
-#include <iostream>
-#include <filesystem>
 
 extern "C" {
   #define STB_IMAGE_IMPLEMENTATION
@@ -47,7 +42,7 @@ namespace Util {
       MatrixXf matG(exp_height, exp_width);
       MatrixXf matB(exp_height, exp_width);
       
-      // zero padding excessive image part
+      // zero padding or crop excessive image part to fit exp_width and exp_height
       for (int r = 0; r < exp_height; r++) {
         if (r >= height) {
           matR.row(r) = VectorXf::Zero(exp_width);
@@ -56,19 +51,15 @@ namespace Util {
           continue;
         }
         for (int c = 0 ; c < exp_width; c++) {
-          matR(r, c) = (c < width) ? static_cast<float>(data[r * width + c + 0]) : 0;
-          matG(r, c) = (c < width) ? static_cast<float>(data[r * width + c + 1]) : 0;
-          matB(r, c) = (c < width) ? static_cast<float>(data[r * width + c + 2]) : 0;
+          matR(r, c) = (c < width) ? static_cast<float>(data[r * width + c + 0]) / 255 : 0;
+          matG(r, c) = (c < width) ? static_cast<float>(data[r * width + c + 1]) / 255 : 0;
+          matB(r, c) = (c < width) ? static_cast<float>(data[r * width + c + 2]) / 255 : 0;
         }
       }
       
       img[0] = matR;
       img[1] = matG;
       img[2] = matB;
-      
-//      cout << matR(0, 0) << " ";
-//      cout << matG(0, 0) << " ";
-//      cout << matB(0, 0) << " ";
     } else {
       cout << "error: invalid image at: " << path << endl;
     }
@@ -116,7 +107,7 @@ namespace Util {
     }
   }
   
-  MatrixXf maxPooling(const MatrixXf& input, int lh, int lw, int sh, int sw) {
+  MatrixXf maxPooling(const MatrixXf& input, int lw, int lh, int sw, int sh) {
     int input_height = input.rows();
     int input_width = input.cols();
     assert(lh <= input_height && lw <= input_width);
@@ -140,6 +131,10 @@ namespace Util {
 
   VectorXf softmax(const VectorXf& input_layer) {
     return input_layer.array().exp() / input_layer.array().exp().sum();
+  }
+
+  VectorXf flatten(MatrixXf mat) {
+    return Map<const VectorXf>(mat.data(), mat.size());
   }
 
   VectorXf sigmoid(const VectorXf& vec) {

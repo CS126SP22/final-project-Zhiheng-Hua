@@ -18,7 +18,7 @@ TEST_CASE("test getDatasetImageCount") {
 
 TEST_CASE("test imageToMatrix") {
   MatrixXf* result = Util::imageToMatrix("data/natural_images/airplane/airplane_0000.jpg", 256, 256);
-  vector<float> rgb_tl{223, 240, 232};  // top left corner
+  vector<float> rgb_tl{223.0f / 255, 240.0f / 255, 232.0f / 255};  // top left corner
   vector<float> rgb_rb{0, 0, 0};        // right bottom corner
   
   for (int i = 0; i < CNN::CHANNEL_COUNT; i++) {
@@ -80,7 +80,7 @@ TEST_CASE("test maxPooling") {
   SECTION("test with tricky shape") {
     MatrixXf expected = MatrixXf(1,2);
     expected << 13, 15;
-    MatrixXf actual = Util::maxPooling(input, 3, 3, 3, 2);
+    MatrixXf actual = Util::maxPooling(input, 3, 3, 2, 3);
 
     REQUIRE(actual == expected);
   }
@@ -122,4 +122,16 @@ TEST_CASE("test sigmoidPrime") {
       }
     }
   }
+}
+
+TEST_CASE("test flatten") {
+  MatrixXf input = MatrixXf(3,3);
+  input << -4, 0, 28,
+            15, -76, 2,
+            1, 0, 39;
+  VectorXf expected(9);
+  expected << -4, 15, 1, 0, -76, 0, 28, 2, 39;
+  VectorXf actual = Util::flatten(input);
+  
+  REQUIRE(actual == expected);
 }

@@ -57,9 +57,16 @@ list(APPEND TEST_FILES  tests/test_util.cc
                         tests/test_cnn.cc)
 
 ci_make_app(
-        APP_NAME        image-classification
+        APP_NAME        cinder-app
         CINDER_PATH     ${CINDER_PATH}
         SOURCES         apps/cinder_app_main.cc ${SOURCE_FILES}
+        INCLUDES        include
+)
+
+ci_make_app(
+        APP_NAME        main
+        CINDER_PATH     ${CINDER_PATH}
+        SOURCES         apps/image_classification_main.cc ${SOURCE_FILES}
         INCLUDES        include
 )
 
