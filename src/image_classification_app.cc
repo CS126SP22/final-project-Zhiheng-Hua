@@ -2,9 +2,13 @@
 
 
 ImageClassificationApp::ImageClassificationApp() 
-    : image_path_(""), message_(""), message_color_(ColorT<float>("white")), prediction_("")
+    : image_path_(""), message_(""), message_color_(ColorT<float>("white")), prediction_(""), model_path_("")
 {
   ci::app::setWindowSize(kWindowSizeX, kWindowSizeY);
+}
+
+void ImageClassificationApp::setup() {
+  
 }
 
 void ImageClassificationApp::draw() {
@@ -38,11 +42,23 @@ void ImageClassificationApp::fileDrop( ci::app::FileDropEvent event ) {
     message_color_ = ColorT<float>("red");
     return;
   }
+  
+  auto file_path = file_vec[0];
+  if (file_path.extension() == ".jpg" || file_path.extension() == ".png") {
+    image_path_ = file_path.string();
+    message_ = "image uploaded successfully";
+    message_color_ = ColorT<float>("green");
 
-  image_path_ = file_vec[0].string();
-  message_ = "image uploaded successfully";
-  message_color_ = ColorT<float>("green");
-
-  // TODO: make a Prediction
-  prediction_ = "Prediction";
+    // make a Prediction
+    MatrixXf* img_mat = Util::imageToMatrix(image_path_, cnn_.getImageWidth(), cnn_.getImageHeight());
+    VectorXf probability = cnn_.predict( img_mat );
+    prediction_ = cnn_.classifyImage(probability);
+  } else if (file_path.extension() == ".mdl") {
+    cnn_.readModel(file_path.string());
+    message_ = "model uploaded successfully";
+    message_color_ = ColorT<float>("green");
+  } else {
+    message_ = "cannot recognize file type";
+    message_color_ = ColorT<float>("red");
+  }
 }

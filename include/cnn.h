@@ -7,7 +7,7 @@
 #include <utility>
 #include <iostream>
 #include <vector>
-
+#include <fstream>
 
 using std::cout;
 using std::endl;
@@ -15,6 +15,11 @@ using std::string;
 using std::vector;
 using std::map;
 using std::pair;
+using std::ofstream;
+using std::ifstream;
+using std::getline;
+using std::stof;
+using std::stoi;
 
 using Eigen::DenseBase;
 using Eigen::VectorXf;
@@ -24,6 +29,9 @@ using Eigen::MatrixXf;  // matrix of int with dynamic size
 
 class CNN {
   public:
+    /**
+     * default constructor, set all fields to zero, set W1, W2 to 3x3 random matrices
+     */
     CNN();
     
     CNN(int kernel_size, const string& path, int img_width, int img_height,
@@ -106,6 +114,30 @@ class CNN {
      * @return name of the classification result
      */
     string classifyImage(const VectorXf& prob);
+    
+    /**
+     * save model and label to /data folder, model in format:
+     * 
+     * image_width
+     * image_height
+     * lw_, lh_, sw_, sh_, c_, n_, s_, t_ (one for a line)
+     * #labels
+     * labels (one label one line)
+     * #rows of W1
+     * #cols of W1
+     * coeffs to W1 (one coeff one line)
+     * #rows of W2
+     * #cols of W2
+     * coeffs to W2 (one coeff one line)
+     * @param filename filename of the output file
+     */
+    void saveModel(const string& filename);
+    
+    /**
+     * read model from model file (.mdl)
+     * @param path path to the model file
+     */
+    void readModel(const string& path);
 
     /**
      * constants
@@ -120,6 +152,8 @@ class CNN {
     int lh_;      // max pooling layer height
     int sw_;      // max pooling layer stride width
     int sh_;      // max pooling layer stride height
+    int image_width_;
+    int image_height_;
     
     // init in loadImageFromDataset
     vector<string> labels_;                 // all labels name as vector
@@ -154,6 +188,10 @@ class CNN {
     const vector<string>& getLabels();
     const map<string, vector<MatrixXf*>>& getImages();
     int getTotalImageCount() const;
+    const MatrixXf& getW1();
+    const MatrixXf& getW2();
+    int getImageWidth() const;
+    int getImageHeight() const;
 };
 
 

@@ -2,6 +2,23 @@
 #include <catch2/catch.hpp>
 #include "util.h"
 
+
+bool matrixApproxEqual(const MatrixXf& m1, const MatrixXf& m2) {
+  if (m1.rows() != m2.rows() || m1.cols() != m2.cols()) {
+    return false;
+  }
+  
+  for (int i = 0; i < m1.rows(); i++) {
+    for (int j = 0; j < m1.cols(); j++) {
+      if (m1(i, j) != Approx(m2(i, j)) ) {
+        return false; 
+      }
+    }
+  }
+  
+  return true;
+}
+
 TEST_CASE("test loadImageFromDataset") {
   CNN cnn;
   cnn.loadImageFromDataset("data/test_image/", 256, 256);
@@ -43,4 +60,49 @@ TEST_CASE("test classifyImage") {
   REQUIRE(cnn.classifyImage(prob) == "airplane");
 }
 
+TEST_CASE("test saveModel") {
+  CNN cnn;
+  cnn.loadImageFromDataset("data/test_image/", 1, 1);
+  cnn.saveModel("natural-images-model-test.mdl");
 
+  ifstream file("data/natural-images-model-test.mdl");
+  REQUIRE(file.is_open());
+
+  int count = 0;
+  string line;
+  while ( getline(file, line) ) {
+    ++count;
+  }
+  
+  file.close();
+  REQUIRE(count == 41);
+
+  remove("data/natural-images-model-test.mdl");
+}
+
+TEST_CASE("test readModel") {
+  CNN cnn;
+  cnn.loadImageFromDataset("data/test_image/", 1, 1);
+  cnn.saveModel("natural-images-model-test.mdl");
+
+  MatrixXf orig_W1 = cnn.getW1();
+  MatrixXf orig_W2 = cnn.getW2();
+
+  CNN cnn2;
+  cnn2.readModel("data/natural-images-model-test.mdl");
+
+  MatrixXf new_W1 = cnn2.getW1();
+  MatrixXf new_W2 = cnn2.getW2();
+  
+  remove("data/natural-images-model-test.mdl");
+  
+  REQUIRE(matrixApproxEqual(orig_W1, new_W1));
+  REQUIRE(matrixApproxEqual(orig_W2, new_W2));
+}
+
+TEST_CASE("playground") {
+  CNN cnn(5, "data/test_image/", 256, 256, 5, 5, 5, 5);
+  
+  cnn.trainModel(500);
+  cnn.saveModel("natural-images-model.mdl");
+}

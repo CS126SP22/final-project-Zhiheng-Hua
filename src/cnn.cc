@@ -2,20 +2,24 @@
 #include "util.h"
 
 
-CNN::CNN() : lw_(0), lh_(0), sw_(0), sh_(0), c_(0), n_(0), s_(0), t_(0) {}
+CNN::CNN() : lw_(0), lh_(0), sw_(0), sh_(0), c_(0), n_(0), s_(0), t_(0), 
+            W1_(MatrixXf::Random(3, 3)), W2_(MatrixXf::Random(3, 3)), image_width_(0), image_height_(0) {}
 
 CNN::CNN(int kernel_size, const string &path, int img_width, int img_height, 
          int lw, int lh, int sw, int sh) 
-   : lw_(lw), lh_(lh), sw_(sw), sh_(sh), c_(0), n_(0), s_(0), t_(0)
+   : lw_(lw), lh_(lh), sw_(sw), sh_(sh), c_(0), n_(0), s_(0), t_(0), 
+     image_width_(img_width), image_height_(img_height)
 {
   initKernels(kernel_size);
   loadImageFromDataset(path, img_width, img_height);
 }
 
 void CNN::loadImageFromDataset(const string &path, int img_width, int img_height) {
-  // init labels_, c_ (label count)
+  // init labels_, c_ (label count), image_width_, image_height
   labels_ = Util::getLabelVectorFromDataset(path);
   c_ = labels_.size();
+  image_width_ = img_width;
+  image_height_ = img_height;
   
   // init expected_map_
   for (int i = 0; i < c_; i++) {
@@ -148,26 +152,6 @@ pair<MatrixXf, MatrixXf> CNN::costFunctionPrime(const map<string, vector<VectorX
   return {dJdW1, dJdW2};
 }
 
-void CNN::updateW1(const MatrixXf& dJdW1) {
-  W1_ -= dJdW1;
-}
-
-void CNN::updateW2(const MatrixXf& dJdW2) {
-  W2_ -= dJdW2;
-}
-
-const vector<string>& CNN::getLabels() {
-  return labels_;
-}
-
-const map<string, vector<MatrixXf*>>& CNN::getImages() {
-  return images_;
-}
-
-int CNN::getTotalImageCount() const {
-  return n_;
-}
-
 void CNN::initKernels(int kernel_size) {
   for (auto & conv_kernel : conv_kernels_) {
     conv_kernel = MatrixXf::Random(kernel_size, kernel_size);
@@ -199,4 +183,143 @@ string CNN::classifyImage(const VectorXf &prob) {
     pred_idx = (prob[i] > prob[pred_idx]) ? i : pred_idx;
   }
   return labels_[pred_idx];
+}
+
+void CNN::saveModel(const string &filename) {
+  ofstream file("data/" + filename);
+  
+  // save image_width, image_height
+  file << image_width_ << "\n" << image_height_ << "\n";
+  
+  // lw_, lh_, sw_, sh_, c_, n_, s_, t_ 
+  file << lw_ << "\n" << lh_ << "\n" << sw_ << "\n" << sh_ << "\n" 
+       << c_ << "\n" << n_ << "\n" << s_ << "\n" << t_ << "\n";
+  
+  // #labels
+  file << labels_.size() << "\n";
+  for (const auto& label : labels_) {
+    file << label << "\n";
+  }
+  
+  // save W1
+  int w1_rows = W1_.rows();
+  int w1_cols = W1_.cols();
+  file << w1_rows << "\n" << w1_cols << "\n";
+  for (int i = 0; i < w1_rows; i++) {
+    for (int j = 0; j < w1_cols; j++) {
+      file << W1_(i, j) << "\n";
+    }
+  }
+  
+  // save W2
+  int w2_rows = W2_.rows();
+  int w2_cols = W2_.cols();
+  file << w2_rows << "\n" << w2_cols << "\n";
+  for (int i = 0; i < w2_rows; i++) {
+    for (int j = 0; j < w2_cols; j++) {
+      file << W2_(i, j) << "\n";
+    }
+  }
+  
+  file.close();
+}
+
+void CNN::readModel(const string &path) {
+  ifstream model(path);
+
+  string line;
+  
+  // image width, height
+  getline(model, line); image_width_ = stoi(line);
+  getline(model, line); image_height_ = stoi(line);
+
+  // lw_, lh_, sw_, sh_, c_, n_, s_, t_ 
+  getline(model, line); lw_ = stoi(line);
+  getline(model, line); lh_ = stoi(line);
+  getline(model, line); sw_ = stoi(line);
+  getline(model, line); sh_ = stoi(line);
+  
+  getline(model, line); c_ = stoi(line);
+  getline(model, line); n_ = stoi(line);
+  getline(model, line); s_ = stoi(line);
+  getline(model, line); t_ = stoi(line);
+
+  // #label
+  getline(model, line);
+  int label_size = stoi(line);
+  labels_ = vector<string>(label_size);
+  
+  // labels
+  for (int i = 0; i < label_size; i++) {
+    getline(model, line);
+    labels_[i] = line;
+  }
+
+  // #rows, #cols of W1
+  getline(model, line);
+  int r1 = stoi(line);
+  getline(model, line);
+  int c1 = stoi(line);
+  W1_ = MatrixXf(r1, c1);
+
+  // coeffs of W1
+  for (int r = 0; r < r1; r++) {
+    for (int c = 0; c < c1; c++) {
+      getline(model, line);
+      W1_(r, c) = stof(line);
+    }
+  }
+
+  // #rows, #cols of W1
+  getline(model, line);
+  int r2 = stoi(line);
+  getline(model, line);
+  int c2 = stoi(line);
+  W2_ = MatrixXf(r2, c2);
+
+  // coeffs of W1
+  for (int r = 0; r < r2; r++) {
+    for (int c = 0; c < c2; c++) {
+      getline(model, line);
+      W2_(r, c) = stof(line);
+    }
+  }
+  
+  model.close();
+}
+
+void CNN::updateW1(const MatrixXf& dJdW1) {
+  W1_ -= dJdW1;
+}
+
+void CNN::updateW2(const MatrixXf& dJdW2) {
+  W2_ -= dJdW2;
+}
+
+const vector<string>& CNN::getLabels() {
+  return labels_;
+}
+
+const map<string, vector<MatrixXf*>>& CNN::getImages() {
+  return images_;
+}
+
+const MatrixXf &CNN::getW1() {
+  return W1_;
+}
+
+const MatrixXf &CNN::getW2() {
+  return W2_;
+}
+
+int CNN::getTotalImageCount() const {
+  return n_;
+}
+
+int CNN::getImageWidth() const {
+  return image_width_;
+}
+
+int CNN::getImageHeight() const {
+  return image_height_;
 }
