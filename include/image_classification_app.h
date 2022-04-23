@@ -22,7 +22,6 @@ class ImageClassificationApp : public ci::app::App {
     ImageClassificationApp();
     
     void draw() override;
-    void setup() override;
     void fileDrop( ci::app::FileDropEvent event ) override;
 
     // provided that you can see the entire UI on your screen.
@@ -37,6 +36,5 @@ class ImageClassificationApp : public ci::app::App {
     ColorT<float> message_color_;
     
     CNN cnn_;
-    string model_path_;
 };
 

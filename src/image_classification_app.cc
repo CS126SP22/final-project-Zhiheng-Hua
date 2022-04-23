@@ -2,13 +2,9 @@
 
 
 ImageClassificationApp::ImageClassificationApp() 
-    : image_path_(""), message_(""), message_color_(ColorT<float>("white")), prediction_(""), model_path_("")
+    : image_path_(""), message_(""), message_color_(ColorT<float>("white")), prediction_("")
 {
   ci::app::setWindowSize(kWindowSizeX, kWindowSizeY);
-}
-
-void ImageClassificationApp::setup() {
-  
 }
 
 void ImageClassificationApp::draw() {
@@ -29,9 +25,9 @@ void ImageClassificationApp::draw() {
 
   Font font = Font("Roboto", 30);
   ci::gl::drawString(prediction_, vec2(200, 20), ColorT<float>("white"), Font("Roboto", 40));
-  ci::gl::drawString("press space to input image path", vec2(120, 520), ColorT<float>("white"), font);
-  ci::gl::drawString("press return to make prediction", vec2(120, 540), ColorT<float>("white"), font);
-  ci::gl::drawString(message_, vec2(120, 560), message_color_, font);
+  ci::gl::drawString("drag and drop model file to upload model", vec2(80, 520), ColorT<float>("white"), font);
+  ci::gl::drawString("drag and drop image to make prediction", vec2(80, 540), ColorT<float>("white"), font);
+  ci::gl::drawString(message_, vec2(80, 560), message_color_, font);
 }
 
 void ImageClassificationApp::fileDrop( ci::app::FileDropEvent event ) {

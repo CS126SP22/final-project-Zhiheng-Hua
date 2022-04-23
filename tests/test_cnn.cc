@@ -75,29 +75,35 @@ TEST_CASE("test saveModel") {
   }
   
   file.close();
-  REQUIRE(count == 41);
-
   remove("data/natural-images-model-test.mdl");
+  
+  REQUIRE(count == 78);
 }
 
 TEST_CASE("test readModel") {
   CNN cnn;
   cnn.loadImageFromDataset("data/test_image/", 1, 1);
   cnn.saveModel("natural-images-model-test.mdl");
-
+  
   MatrixXf orig_W1 = cnn.getW1();
   MatrixXf orig_W2 = cnn.getW2();
+  int orig_width = cnn.getImageWidth();
+  int orig_height = cnn.getImageHeight();
 
   CNN cnn2;
   cnn2.readModel("data/natural-images-model-test.mdl");
 
   MatrixXf new_W1 = cnn2.getW1();
   MatrixXf new_W2 = cnn2.getW2();
+  int new_width = cnn2.getImageWidth();
+  int new_height = cnn2.getImageHeight();
   
   remove("data/natural-images-model-test.mdl");
   
   REQUIRE(matrixApproxEqual(orig_W1, new_W1));
   REQUIRE(matrixApproxEqual(orig_W2, new_W2));
+  REQUIRE(orig_width == new_width);
+  REQUIRE(orig_height == new_height);
 }
 
 TEST_CASE("playground") {

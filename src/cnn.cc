@@ -3,7 +3,10 @@
 
 
 CNN::CNN() : lw_(0), lh_(0), sw_(0), sh_(0), c_(0), n_(0), s_(0), t_(0), 
-            W1_(MatrixXf::Random(3, 3)), W2_(MatrixXf::Random(3, 3)), image_width_(0), image_height_(0) {}
+            W1_(MatrixXf::Random(3, 3)), W2_(MatrixXf::Random(3, 3)), image_width_(0), image_height_(0) 
+{
+  initKernels(3);
+}
 
 CNN::CNN(int kernel_size, const string &path, int img_width, int img_height, 
          int lw, int lh, int sw, int sh) 
@@ -201,6 +204,26 @@ void CNN::saveModel(const string &filename) {
     file << label << "\n";
   }
   
+  // kernels size
+  file << second_conv_kernel_.rows() << "\n";
+  
+  // conv kernels
+  for (int channel = 0; channel < CNN::CHANNEL_COUNT; channel++) {
+    const MatrixXf& curr_kernel = conv_kernels_[channel];
+    for (int i = 0; i < curr_kernel.rows(); i++) {
+      for (int j = 0; j < curr_kernel.cols(); j++) {
+        file << curr_kernel(i, j) << "\n";
+      }
+    }
+  }
+  
+  // second conv kernel
+  for (int i = 0; i < second_conv_kernel_.rows(); i++) {
+    for (int j = 0; j < second_conv_kernel_.cols(); j++) {
+      file << second_conv_kernel_(i, j) << "\n";
+    }
+  }
+  
   // save W1
   int w1_rows = W1_.rows();
   int w1_cols = W1_.cols();
@@ -251,9 +274,34 @@ void CNN::readModel(const string &path) {
   
   // labels
   for (int i = 0; i < label_size; i++) {
-    getline(model, line);
-    labels_[i] = line;
+    getline(model, line); labels_[i] = line;
   }
+
+  // kernels size
+  getline(model, line); 
+  int kernel_size = stoi(line);
+
+  // conv kernels
+  for (int channel = 0; channel < CNN::CHANNEL_COUNT; channel++) {
+    MatrixXf curr_kernel(kernel_size, kernel_size);
+    for (int i = 0; i < kernel_size; i++) {
+      for (int j = 0; j < kernel_size; j++) {
+        getline(model, line);
+        curr_kernel(i, j) = stof(line);
+      }
+    }
+    conv_kernels_[channel] = curr_kernel;
+  }
+
+  // second conv kernel
+  MatrixXf sec_kernel(kernel_size, kernel_size);
+  for (int i = 0; i < kernel_size; i++) {
+    for (int j = 0; j < kernel_size; j++) {
+      getline(model, line);
+      sec_kernel(i, j) = stof(line);
+    }
+  }
+  second_conv_kernel_ = sec_kernel;
 
   // #rows, #cols of W1
   getline(model, line);

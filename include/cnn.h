@@ -121,14 +121,18 @@ class CNN {
      * image_width
      * image_height
      * lw_, lh_, sw_, sh_, c_, n_, s_, t_ (one for a line)
+     * 
      * #labels
      * labels (one label one line)
-     * #rows of W1
-     * #cols of W1
-     * coeffs to W1 (one coeff one line)
-     * #rows of W2
-     * #cols of W2
-     * coeffs to W2 (one coeff one line)
+     * 
+     * kernel_size
+     * kernel1 coeffs of each [rgb]     (different lines)
+     * second_conv_kernel, coeffs       (different lines)
+     * 
+     * #rows of W1, #cols of W1 (two lines)
+     * coeffs of W1 (one coeff one line)
+     * #rows of W2, #cols of W2 (two lines)
+     * coeffs of W2 (one coeff one line)
      * @param filename filename of the output file
      */
     void saveModel(const string& filename);
