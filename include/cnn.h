@@ -24,12 +24,10 @@ using Eigen::MatrixXf;  // matrix of int with dynamic size
 
 class CNN {
   public:
-    /**
-     * constructor
-     * @param kernel_size size of the kernel to use for convolution,
-     * should be an odd number
-     */
-    CNN(int kernel_size);
+    CNN();
+    
+    CNN(int kernel_size, const string& path, int img_width, int img_height,
+        int lw, int lh, int sw, int sh);
     
     /**
      * parse all image from dataset into matrices, store them in the CNN class
@@ -52,6 +50,14 @@ class CNN {
      */
     MatrixXf softmaxJacobian(const VectorXf& y_hat);
 
+    /**
+     * forward propagation in the feature section
+     * @param lw maxPooling layer width
+     * @param lh maxPooling layer height
+     * @param sw maxPooling stride width
+     * @param sh maxPooling stride height
+     * @return map of string to flattened image
+     */
     map<string, vector<VectorXf>> featureForwardPropagation();
 
     /**
@@ -79,6 +85,27 @@ class CNN {
      * @param dJdW2 gradient of cost function with respect to W2 
      */
     void updateW2(const MatrixXf& dJdW2);
+    
+    /**
+     * one single function that takes care all training process
+     * when this function finish, W1, W2 will be trained    // TODO: update kernels as well
+     * @param max_iter 
+     */
+    void trainModel(int max_iter);
+    
+    /**
+     * make a prediction base on image
+     * @param image input image, array of size 3 [r, g, b]
+     * @return probability vector
+     */
+    VectorXf predict(MatrixXf* image);
+    
+    /**
+     * get the name of the resulting class using probability vector provided
+     * @param prob probability vector 
+     * @return name of the classification result
+     */
+    string classifyImage(const VectorXf& prob);
 
     /**
      * constants
@@ -86,8 +113,13 @@ class CNN {
     const static int CHANNEL_COUNT = 3;
 
   private:
-    // init in constructor
+    // init directly in constructor
     MatrixXf conv_kernels_[CHANNEL_COUNT];   // array of convolutional layer kernels
+    MatrixXf second_conv_kernel_;
+    int lw_;      // max pooling layer width
+    int lh_;      // max pooling layer height
+    int sw_;      // max pooling layer stride width
+    int sh_;      // max pooling layer stride height
     
     // init in loadImageFromDataset
     vector<string> labels_;                 // all labels name as vector
@@ -95,11 +127,25 @@ class CNN {
     map<string, VectorXf> expected_map_;    // mapping label name to expected prob vector
     int c_;                                 // label_count_
     int n_;                                 // total_image_count_
-    // TODO: init below in loadImage
+    
+    // init in featureForwardPropagation 
     int s_;                   // image_size_ (size of the vector after flattened)
-    int t_;                   // hidden_unit_number_ floor((s + label_count_) / 2)
+    int t_;                   // hidden_unit_number_ floor((s + c) / 2)
     MatrixXf W1_;             // shape: s x t
     MatrixXf W2_;             // shape: t x c
+    
+    /**
+     * randomly init convolutional layer kernels
+     * @param kernel_size size of conv_kernels
+     */
+    void initKernels(int kernel_size);
+    
+    /**
+     * convert a [r, g, b] image to a flattened, smaller 1d vector
+     * @param img image represented using [r, g, b]
+     * @return converted image representation, input of fully connected layer
+     */
+    VectorXf featureForwardHelper(const MatrixXf* img);
     
   public:
     /**

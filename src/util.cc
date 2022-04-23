@@ -70,29 +70,35 @@ namespace Util {
 
 
   MatrixXf convolution3D(const MatrixXf* input, const MatrixXf* conv_kernel) {
-    int input_height = input[0].rows();
-    int input_width = input[0].cols();
-    int kernel_height = conv_kernel[0].rows();
-    int kernel_width = conv_kernel[0].cols();
-    
-    MatrixXf result = MatrixXf::Zero(input_height, input_width);
-    
-    // prepare padding, reused in the loop
-    MatrixXf padding_mat = MatrixXf::Zero(input_height + kernel_height - 1, input_width + kernel_width - 1);
+    MatrixXf result = MatrixXf::Zero(input[0].rows(), input[0].cols());
     
     for (int channel = 0; channel < CNN::CHANNEL_COUNT; channel++) {
       // convolution for each input kernel pair
       const MatrixXf& curr_input = input[channel];
       const MatrixXf& curr_kernel = conv_kernel[channel];
       
-      // change padding for input matrix first
-      padding_mat.block(1, 1, input_height, input_width) = curr_input;
-      
-      for (int r = 0 ; r < input_height; r++) {
-        for (int c = 0; c < input_width; c++) {
-          MatrixXf curr_blk = padding_mat.block(r, c, kernel_height, kernel_width);
-          result(r, c) += (curr_blk.array() * conv_kernel[channel].array()).sum();
-        }
+      result += convolution(curr_input, curr_kernel);
+    }
+    
+    return result;
+  }
+
+  MatrixXf convolution(const MatrixXf& input, const MatrixXf& conv_kernel) {
+    int input_height = input.rows();
+    int input_width = input.cols();
+    int kernel_height = conv_kernel.rows();
+    int kernel_width = conv_kernel.cols();
+
+    MatrixXf result = MatrixXf::Zero(input_height, input_width);
+
+    // padding matrix
+    MatrixXf padding_mat = MatrixXf::Zero(input_height + kernel_height - 1, input_width + kernel_width - 1);
+    padding_mat.block(1, 1, input_height, input_width) = input;
+
+    for (int r = 0 ; r < input_height; r++) {
+      for (int c = 0; c < input_width; c++) {
+        MatrixXf curr_blk = padding_mat.block(r, c, kernel_height, kernel_width);
+        result(r, c) = (curr_blk.array() * conv_kernel.array()).sum();
       }
     }
     

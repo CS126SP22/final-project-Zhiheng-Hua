@@ -1,8 +1,9 @@
 #include "cnn.h"
 #include <catch2/catch.hpp>
+#include "util.h"
 
 TEST_CASE("test loadImageFromDataset") {
-  CNN cnn(3);
+  CNN cnn;
   cnn.loadImageFromDataset("data/test_image/", 256, 256);
 
   vector<string> expected_labels{"airplane","car","cat","dog","flower","fruit","motorbike","person"};
@@ -17,26 +18,29 @@ TEST_CASE("test loadImageFromDataset") {
   REQUIRE(cnn.getTotalImageCount() == 88);
 }
 
-TEST_CASE("test forward costFunctionPrime") {
-  CNN cnn(5);
-  cnn.loadImageFromDataset("data/test_image/", 25, 25);
+TEST_CASE("test trainModel") {
+  CNN cnn(5, "data/test_image/", 256, 256, 5, 5, 5, 5);
+  cnn.trainModel(500);
+  
+  MatrixXf* image = Util::imageToMatrix("data/test_image/flower/flower_0000.jpg", 256, 256);
+  VectorXf pred = cnn.predict(image);
 
-  auto Xs = cnn.featureForwardPropagation();
-  
-  for (int iter = 0; iter < 1000; iter++) {
-    float error1;
-    pair<MatrixXf, MatrixXf> result1 = cnn.costFunctionPrime(Xs, &error1);
-
-    cnn.updateW1(result1.first);
-    cnn.updateW2(result1.second);
-  }
-  
-  VectorXf pred = cnn.FcForwardPropagation(Xs["flower"][0])[2];
-  
   int pred_idx = 0;
   for (int i = 0; i < pred.size(); i++) {
     pred_idx = (pred[i] > pred[pred_idx]) ? i : pred_idx;
   }
-  
+
   REQUIRE(pred_idx == 4);
 }
+
+TEST_CASE("test classifyImage") {
+  CNN cnn;
+  cnn.loadImageFromDataset("data/test_image/", 1, 1);
+  
+  VectorXf prob(8);
+  prob << 1.0f, 0.4f, 0.5f, 0.2f, 0.0f, 0.1f, 0.8f, 0.8f;
+  
+  REQUIRE(cnn.classifyImage(prob) == "airplane");
+}
+
+

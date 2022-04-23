@@ -62,6 +62,8 @@ namespace Util {
    */
   MatrixXf convolution3D(const MatrixXf* input, const MatrixXf* conv_kernel);
   
+  MatrixXf convolution(const MatrixXf& input, const MatrixXf& conv_kernel);
+  
   /**
    * take in a matrix reference, apply Relu on it
    * @param input matrix to apply Relu
@@ -71,10 +73,10 @@ namespace Util {
   /**
    * perform max pooling
    * @param input matrix to perform operation
-   * @param lh layer height
    * @param lw layer width
-   * @param sh stride height
+   * @param lh layer height
    * @param sw stride width
+   * @param sh stride height
    * @return max pooling result
    */
   MatrixXf maxPooling(const MatrixXf& input, int lw, int lh, int sw, int sh);

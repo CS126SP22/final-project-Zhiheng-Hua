@@ -51,10 +51,12 @@ include("${CINDER_PATH}/proj/cmake/modules/cinderMakeApp.cmake")
 
 list(APPEND SOURCE_FILES    src/image_classification_app.cc
                             src/util.cc
-                            src/cnn.cc)
+                            src/cnn.cc
+                            src/training.cc)
 
 list(APPEND TEST_FILES  tests/test_util.cc
-                        tests/test_cnn.cc)
+                        tests/test_cnn.cc
+                        tests/test_training.cc)
 
 ci_make_app(
         APP_NAME        cinder-app

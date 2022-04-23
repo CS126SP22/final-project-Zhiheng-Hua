@@ -2,15 +2,18 @@
 #include "util.h"
 
 
+CNN::CNN() : lw_(0), lh_(0), sw_(0), sh_(0), c_(0), n_(0), s_(0), t_(0) {}
 
-CNN::CNN(int kernel_size) {
-  for (auto & conv_kernel : conv_kernels_) {
-    conv_kernel = MatrixXf::Random(kernel_size, kernel_size);
-  }
+CNN::CNN(int kernel_size, const string &path, int img_width, int img_height, 
+         int lw, int lh, int sw, int sh) 
+   : lw_(lw), lh_(lh), sw_(sw), sh_(sh), c_(0), n_(0), s_(0), t_(0)
+{
+  initKernels(kernel_size);
+  loadImageFromDataset(path, img_width, img_height);
 }
 
 void CNN::loadImageFromDataset(const string &path, int img_width, int img_height) {
-  // init labels_, c_ (label count), image_width_, image_height_
+  // init labels_, c_ (label count)
   labels_ = Util::getLabelVectorFromDataset(path);
   c_ = labels_.size();
   
@@ -57,28 +60,35 @@ MatrixXf CNN::softmaxJacobian(const VectorXf& y_hat) {
 }
 
 map<string, vector<VectorXf>> CNN::featureForwardPropagation() {
-  // FIXME: should be in loadimage 
-  s_ = 25;
-  t_ = 16;
-  W1_ = MatrixXf::Random(s_, t_);
-  W2_ = MatrixXf::Random(t_, c_);
-
   map<string, vector<VectorXf>> Xs;
-  
   for (const auto& entry : images_) {
     // init map
     Xs.insert({entry.first, vector<VectorXf>()});
     // loop through image
     for (const MatrixXf* img : entry.second) {
-      MatrixXf conv_res = Util::convolution3D(img, conv_kernels_);
-      Util::Relu(conv_res);
-      MatrixXf pooling_res = Util::maxPooling(conv_res, 5, 5, 5, 5);  // FIXME: hardcoded
-      VectorXf X = Util::flatten(pooling_res);
+      VectorXf X = featureForwardHelper(img);
       Xs[entry.first].push_back(X);
     }
   }
   
+  s_ = Xs.begin()->second[1].size();
+  t_ = (s_ + c_) / 2;
+  W1_ = MatrixXf::Random(s_, t_);
+  W2_ = MatrixXf::Random(t_, c_);
+  
   return Xs;
+}
+
+VectorXf CNN::featureForwardHelper(const MatrixXf* img) {
+  MatrixXf conv_res1 = Util::convolution3D(img, conv_kernels_);
+  Util::Relu(conv_res1);
+  MatrixXf pooling_res1 = Util::maxPooling(conv_res1, lw_, lh_, sw_, sh_);
+  
+  MatrixXf conv_res2 = Util::convolution(pooling_res1, second_conv_kernel_);
+  Util::Relu(conv_res2);
+  MatrixXf pooling_res2 = Util::maxPooling(conv_res2, lw_, lh_, sw_, sh_);
+
+  return Util::flatten(pooling_res2);
 }
 
 vector<VectorXf> CNN::FcForwardPropagation(const VectorXf& X) {
@@ -156,4 +166,37 @@ const map<string, vector<MatrixXf*>>& CNN::getImages() {
 
 int CNN::getTotalImageCount() const {
   return n_;
+}
+
+void CNN::initKernels(int kernel_size) {
+  for (auto & conv_kernel : conv_kernels_) {
+    conv_kernel = MatrixXf::Random(kernel_size, kernel_size);
+  }
+  second_conv_kernel_ = MatrixXf::Random(kernel_size, kernel_size);
+}
+
+VectorXf CNN::predict(MatrixXf* image) {
+  VectorXf X = featureForwardHelper(image);
+  return FcForwardPropagation(X)[2];
+}
+
+void CNN::trainModel(int max_iter)
+{
+  auto Xs = featureForwardPropagation();
+
+  for (int iter = 0; iter < max_iter; iter++) {
+    float error;
+    pair<MatrixXf, MatrixXf> result = costFunctionPrime(Xs, &error);
+    updateW1(result.first);
+    updateW2(result.second);
+  }
+}
+
+string CNN::classifyImage(const VectorXf &prob) {
+  // obtain idx of highest probability
+  int pred_idx = 0;
+  for (int i = 0; i < prob.size(); i++) {
+    pred_idx = (prob[i] > prob[pred_idx]) ? i : pred_idx;
+  }
+  return labels_[pred_idx];
 }
