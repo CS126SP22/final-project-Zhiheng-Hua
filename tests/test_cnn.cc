@@ -63,9 +63,9 @@ TEST_CASE("test classifyImage") {
 TEST_CASE("test saveModel") {
   CNN cnn;
   cnn.loadImageFromDataset("data/test_image/", 1, 1);
-  cnn.saveModel("natural-images-model-test.mdl");
+  cnn.saveModel("natural-images-model-test.cnn");
 
-  ifstream file("data/natural-images-model-test.mdl");
+  ifstream file("data/natural-images-model-test.cnn");
   REQUIRE(file.is_open());
 
   int count = 0;
@@ -75,7 +75,7 @@ TEST_CASE("test saveModel") {
   }
   
   file.close();
-  remove("data/natural-images-model-test.mdl");
+  remove("data/natural-images-model-test.cnn");
   
   REQUIRE(count == 78);
 }
@@ -83,7 +83,7 @@ TEST_CASE("test saveModel") {
 TEST_CASE("test readModel") {
   CNN cnn;
   cnn.loadImageFromDataset("data/test_image/", 1, 1);
-  cnn.saveModel("natural-images-model-test.mdl");
+  cnn.saveModel("natural-images-model-test.cnn");
   
   MatrixXf orig_W1 = cnn.getW1();
   MatrixXf orig_W2 = cnn.getW2();
@@ -91,14 +91,14 @@ TEST_CASE("test readModel") {
   int orig_height = cnn.getImageHeight();
 
   CNN cnn2;
-  cnn2.readModel("data/natural-images-model-test.mdl");
+  cnn2.readModel("data/natural-images-model-test.cnn");
 
   MatrixXf new_W1 = cnn2.getW1();
   MatrixXf new_W2 = cnn2.getW2();
   int new_width = cnn2.getImageWidth();
   int new_height = cnn2.getImageHeight();
   
-  remove("data/natural-images-model-test.mdl");
+  remove("data/natural-images-model-test.cnn");
   
   REQUIRE(matrixApproxEqual(orig_W1, new_W1));
   REQUIRE(matrixApproxEqual(orig_W2, new_W2));
@@ -106,9 +106,11 @@ TEST_CASE("test readModel") {
   REQUIRE(orig_height == new_height);
 }
 
-TEST_CASE("playground") {
-  CNN cnn(5, "data/test_image/", 256, 256, 5, 5, 5, 5);
-  
-  cnn.trainModel(500);
-  cnn.saveModel("natural-images-model.mdl");
+TEST_CASE("Test trainModel") {
+  CNN cnn(5, "data/intel_image/small_set", 150, 150, 5, 5, 5, 5);
+
+  VectorXf res = cnn.trainModel(500);
+  cnn.saveModel("intel-images-model.cnn");
+
+  REQUIRE(res.size() == 500);
 }

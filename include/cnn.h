@@ -99,7 +99,7 @@ class CNN {
      * when this function finish, W1, W2 will be trained    // TODO: update kernels as well
      * @param max_iter 
      */
-    void trainModel(int max_iter);
+    VectorXf trainModel(int max_iter);
     
     /**
      * make a prediction base on image

@@ -167,8 +167,9 @@ VectorXf CNN::predict(MatrixXf* image) {
   return FcForwardPropagation(X)[2];
 }
 
-void CNN::trainModel(int max_iter)
+VectorXf CNN::trainModel(int max_iter)
 {
+  VectorXf res(max_iter);
   auto Xs = featureForwardPropagation();
 
   for (int iter = 0; iter < max_iter; iter++) {
@@ -176,11 +177,14 @@ void CNN::trainModel(int max_iter)
     pair<MatrixXf, MatrixXf> result = costFunctionPrime(Xs, &error);
     updateW1(result.first);
     updateW2(result.second);
+    res[iter] = error;
   }
+  
+  return res;
 }
 
 string CNN::classifyImage(const VectorXf &prob) {
-  // obtain idx of highest probability
+  // obtain idx of the highest probability
   int pred_idx = 0;
   for (int i = 0; i < prob.size(); i++) {
     pred_idx = (prob[i] > prob[pred_idx]) ? i : pred_idx;

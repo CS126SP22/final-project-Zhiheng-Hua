@@ -51,10 +51,12 @@ include("${CINDER_PATH}/proj/cmake/modules/cinderMakeApp.cmake")
 
 list(APPEND SOURCE_FILES    src/image_classification_app.cc
                             src/util.cc
-                            src/cnn.cc)
+                            src/cnn.cc
+                            src/analysis.cc)
 
 list(APPEND TEST_FILES  tests/test_util.cc
-                        tests/test_cnn.cc)
+                        tests/test_cnn.cc
+                        tests/test_analysis.cc)
 
 ci_make_app(
         APP_NAME        cinder-app
@@ -64,7 +66,7 @@ ci_make_app(
 )
 
 ci_make_app(
-        APP_NAME        main
+        APP_NAME        training-main
         CINDER_PATH     ${CINDER_PATH}
         SOURCES         apps/image_classification_main.cc ${SOURCE_FILES}
         INCLUDES        include
@@ -88,4 +90,5 @@ INCLUDE_DIRECTORIES( ${STB_DIR} )
 
 if(MSVC)
     set_property(TARGET image-classification-test APPEND_STRING PROPERTY LINK_FLAGS " /SUBSYSTEM:CONSOLE")
+    set_property(TARGET training-main APPEND_STRING PROPERTY LINK_FLAGS " /SUBSYSTEM:CONSOLE")
 endif()
