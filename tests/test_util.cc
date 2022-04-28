@@ -1,23 +1,23 @@
 #include "util.h"
 #include "cnn.h"
 #include <catch2/catch.hpp>
-#include <math.h>
+#include <cmath>
 
 
 
 TEST_CASE("test getLabelVectorFromDataset") {
-  Util::getLabelVectorFromDataset("data/natural_images");
+  Util::getLabelVectorFromDataset("data/NATURAL");
   vector<string> expected = {};
   REQUIRE(1 == 1);
 }
 
 TEST_CASE("test getDatasetImageCount") {
-  int img_count = Util::getDatasetImageCount("data/natural_images");
-  REQUIRE(img_count == 6899);
+  int img_count = Util::getDatasetImageCount("data/NATURAL");
+  REQUIRE(img_count == 800);
 }
 
 TEST_CASE("test imageToMatrix") {
-  MatrixXf* result = Util::imageToMatrix("data/natural_images/airplane/airplane_0000.jpg", 256, 256);
+  MatrixXf* result = Util::imageToMatrix("data/NATURAL/airplane/airplane_0000.jpg", 256, 256);
   vector<float> rgb_tl{223.0f / 255, 240.0f / 255, 232.0f / 255};  // top left corner
   vector<float> rgb_rb{0, 0, 0};        // right bottom corner
   

@@ -55,8 +55,7 @@ list(APPEND SOURCE_FILES    src/image_classification_app.cc
                             src/analysis.cc)
 
 list(APPEND TEST_FILES  tests/test_util.cc
-                        tests/test_cnn.cc
-                        tests/test_analysis.cc)
+                        tests/test_cnn.cc)
 
 ci_make_app(
         APP_NAME        cinder-app

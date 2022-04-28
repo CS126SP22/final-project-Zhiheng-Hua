@@ -21,7 +21,9 @@ void ImageClassificationApp::draw() {
   ci::gl::drawString(message_, vec2(80, 560), message_color_, font);
   
   if (showAnalysis_) {
-    analysis_.drawErrorLineGraph(training_errors_);
+    float y_lim = analysis_.drawErrorLineGraph(training_errors_);
+    analysis_.xAxisLabel(MAX_ITER, "iterations");
+    analysis_.yAxisLabel(y_lim, "cost\nfunction\nerrors");
     return;
   }
   
@@ -79,7 +81,7 @@ void ImageClassificationApp::fileDrop( ci::app::FileDropEvent event ) {
   } else if (fs::is_directory(file_path)) {
     // train Model
     cnn_ = CNN(kernel_size_, file_path.string(), img_width_, img_height_, lw_, lh_, sw_, sh_);
-    training_errors_ = cnn_.trainModel(500);
+    training_errors_ = cnn_.trainModel(MAX_ITER);
     
     // save model with timestamp filename
     time_t t = time(nullptr);   // get time now
@@ -145,6 +147,7 @@ void ImageClassificationApp::drawConfigInterface() {
   ci::gl::drawString("press <- to select previous", vec2(80, 480), ColorT<float>("purple"), font);
   ci::gl::drawString("press up to increase or down to decrease", vec2(80, 500), ColorT<float>("purple"), font);
   ci::gl::drawString("press esc to go back to main page", vec2(80, 520), ColorT<float>("purple"), font);
+  ci::gl::drawString("drop image dataset folder to start training", vec2(60, 550), ColorT<float>("white"), font);
 }
 
 void ImageClassificationApp::configIncrement() {
