@@ -46,6 +46,18 @@ TEST_CASE("test convolution3D") {
   REQUIRE(Util::convolution3D(input, kernels) == expected);
 }
 
+TEST_CASE("test convolution") {
+  MatrixXf input = MatrixXf(2,2);
+  input << 1, 2, 3, 4;
+  MatrixXf kernels = MatrixXf(3,3);
+  kernels << 1, 0, -1, 1, 0, -1, 1, 0, -1;
+
+  MatrixXf expected = MatrixXf(2,2);
+  expected << -6, 4, -6, 4;
+
+  REQUIRE(Util::convolution(input, kernels) == expected);
+}
+
 TEST_CASE("test Relu") {
   MatrixXf input = MatrixXf(3,3);
   input << -4, 0, 28, 
