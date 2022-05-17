@@ -110,7 +110,9 @@ TEST_CASE("Test trainModel") {
   CNN cnn(5, "data/intel_image/small_set", 150, 150, 5, 5, 5, 5);
 
   VectorXf res = cnn.trainModel(500);
-  cnn.saveModel("intel-images-model.cnn");
+  cnn.saveModel("intel-images-model-test.cnn");
+  
+  remove("data/intel-images-model-test.cnn");
 
   REQUIRE(res.size() == 500);
 }

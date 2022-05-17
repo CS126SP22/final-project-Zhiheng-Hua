@@ -41,6 +41,7 @@ class ImageClassificationApp : public ci::app::App {
     const int k_MIN_CONFIG_IDX = 0;
     const int k_MAX_CONFIG_IDX = 6;
     
+    const int MAX_ITER = 500;
     const vec2 configTopLeft = vec2(60, 60); // top left corner of config window
     const vec2 configSize = vec2(480, 480);  // config window size
     const vec2 configCursorSize = vec2(10, 10);
