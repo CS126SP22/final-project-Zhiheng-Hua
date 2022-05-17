@@ -135,7 +135,7 @@ void ImageClassificationApp::drawConfigInterface() {
 
   Font font = Font("Roboto", 30);
   
-  ci::gl::drawString("Kernel Sise\n" + to_string(kernel_size_), configOptionPos[0], ColorT<float>("black"), font);
+  ci::gl::drawString("Kernel Size\n" + to_string(kernel_size_), configOptionPos[0], ColorT<float>("black"), font);
   ci::gl::drawString("Image Width\n" + to_string(img_width_), configOptionPos[1], ColorT<float>("black"), font);
   ci::gl::drawString("Image Height\n" + to_string(img_height_), configOptionPos[2], ColorT<float>("black"), font);
   ci::gl::drawString("Max Pooling Layer Width\n" + to_string(lw_), configOptionPos[3], ColorT<float>("black"), font);
